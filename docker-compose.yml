@@ -2,6 +2,8 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: prometheus
+    labels:
+      - "traefik.enable=true"
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
@@ -13,6 +15,12 @@ services:
   grafana:
     image: grafana/grafana
     container_name: grafana
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.example.com`)"
+      - "traefik.http.routers.grafana.entrypoints=web"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+
     ports:
       - 3000:3000
     restart: unless-stopped
@@ -24,6 +32,8 @@ services:
   plex:
     image: linuxserver/plex
     container_name: plex
+    labels:
+      - "traefik.enable=true"
     network_mode: host
     environment:
       - VERSION=docker
@@ -32,22 +42,24 @@ services:
       - ./plex:/etc/plex
   minecraft:
     image: itzg/minecraft-server
+    labels:
+      - "traefik.enable=true"
     ports:
       - "25565:25565"
     volumes:
       - "~/minecraft_data:/data"
   reverse-proxy:
-    # The official v3 Traefik docker image
     image: traefik:v3.3
-    # Enables the web UI and tells Traefik to listen to docker
     command: --api.insecure=true --providers.docker
     ports:
-      # The HTTP port
       - "80:80"
-      # The Web UI (enabled by --api.insecure=true)
       - "8080:8080"
     volumes:
-      # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
+  whoami:
+    # A container that exposes an API to show its IP address
+    image: traefik/whoami
+    labels:
+      - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
 volumes:
-  prom_data:~
+  prom_data:
