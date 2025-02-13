@@ -1,4 +1,31 @@
 services:
+
+  reverse-proxy:
+    image: traefik:v3.3
+    container_name: traefik
+    command:
+      - --entryPoints.web.address=:80
+      - --entryPoints.websecure.address=:443
+      - --providers.docker=true
+      - --api.insecure=true
+      #- --certificatesResolvers.myresolver.acme.tlsChallenge=true
+      #- --certificatesResolvers.myresolver.acme.email=your-email@example.com
+      #- --certificatesResolvers.myresolver.acme.storage=/etc/traefik/acme.json
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./acme.json:/etc/traefik/acme.json
+
+  whoami:
+    image: traefik/whoami
+    container_name: "simple-service"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.localhost`)"
+      - "traefik.http.routers.whoami.entryPoints=web"
   prometheus:
     image: prom/prometheus
     container_name: prometheus
@@ -48,18 +75,5 @@ services:
       - "25565:25565"
     volumes:
       - "~/minecraft_data:/data"
-  reverse-proxy:
-    image: traefik:v3.3
-    command: --api.insecure=true --providers.docker
-    ports:
-      - "80:80"
-      - "8080:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-  whoami:
-    # A container that exposes an API to show its IP address
-    image: traefik/whoami
-    labels:
-      - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
 volumes:
   prom_data:
