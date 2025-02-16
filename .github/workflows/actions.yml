@@ -7,21 +7,18 @@ on:
     branches: [ "main" ]
 
 jobs:
-  lint:                    # Updated job name for clarity
-    name: Linting Job
+  lint:
+    name: Lint Dockerfile with Hadolint
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout repository code
-      - name: Checkout Repository
+      - name: Checkout code            # Checkout the repository
         uses: actions/checkout@v3
 
-      # Step 2: Lint Dockerfile using Hadolint
-      - name: Lint Dockerfile with Hadolint
+      - name: Lint Dockerfile
         uses: docker://hadolint/hadolint:latest
         with:
-          args: < ${{ env.DOCKERFILE_PATH }}
-env:
-  DOCKERFILE_PATH: Dockerfile      # Extracted Dockerfile path as an environment variable
+          args: < Dockerfile           # Run Hadolint on your Dockerfile
+
   build:
     name: Build Stage
     runs-on: ubuntu-latest
