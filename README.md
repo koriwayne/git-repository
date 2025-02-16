@@ -34,7 +34,8 @@ ARC Action Runners
 
 - Choose a Dockerfile Linter
     - Trivy
-    - Handolint
+    - Hadolint  Linting Dockerfiles
+    - Yamlint   Linting yaml files
     - Dockle
         - git clone https://github.com/goodwithtech/dockle.git
         - cd dockle
@@ -42,5 +43,7 @@ ARC Action Runners
 
 - Add Dockerfile lint job to the Security Policy Repo
 - Scan results uploaded to the Vulnerability Dashboard
+- Test github actions
+- Test github runners
 
 ```
