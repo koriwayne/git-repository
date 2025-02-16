@@ -6,12 +6,9 @@ on:
   pull_request:
     branches: [ "main" ]
 
-env:
-  DOCKERFILE_PATH: Dockerfile         # Extracted Dockerfile path to an environment variable
-
 jobs:
-  lint-dockerfile:                    # Updated job name for clarity
-    name: Dockerfile Linting Job
+  lint:                    # Updated job name for clarity
+    name: Linting Job
     runs-on: ubuntu-latest
     steps:
       # Step 1: Checkout repository code
@@ -23,7 +20,20 @@ jobs:
         uses: docker://hadolint/hadolint:latest
         with:
           args: < ${{ env.DOCKERFILE_PATH }}
+env:
+  DOCKERFILE_PATH: Dockerfile      # Extracted Dockerfile path as an environment variable
+  build:
+    name: Build Stage
+    runs-on: ubuntu-latest
+    needs: lint                       # Wait for 'lint' stage to complete
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
+      - name: Run Build
+        run: |
+          echo "Building application"
+          docker-compose up --build -d
   test:
     name: Test Stage
     runs-on: ubuntu-latest
