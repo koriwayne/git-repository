@@ -20,7 +20,7 @@ jobs:
       - name: Lint Dockerfile
         uses: docker://hadolint/hadolint:latest
         with:
-          args: < ${{ env.DOCKERFILE_PATH }}
+          args: ${{ env.DOCKERFILE_PATH }}
 
   lint-yaml:
     name: Lint YAML Files
