@@ -11,16 +11,26 @@ env:    # environment variables
 
 jobs:
   lint:
-    name: Lint Dockerfile with Hadolint
+    name: Lint Docker Compose with Hadolint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code            # Checkout the repository
+      - name: Checkout Repository            # Checkout the repository
         uses: actions/checkout@v3
-        # Run Hadolint on your Dockerfile
-      - name: Lint Dockerfile
-        uses: docker://hadolint/hadolint:latest
-        with:
-          args: ${{ env.DOCKERFILE_PATH }}
+      # Step 2: Install Hadolint
+      - name: Install Hadolint
+        run: |
+          wget -O /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+          chmod +x /usr/local/bin/hadolint
+
+      # Step 3: Lint docker-compose.yml
+      - name: Lint the Docker Compose File
+        run: |
+          if [ -e docker-compose.yml ]; then
+            hadolint docker-compose.yml
+          else
+            echo "No docker-compose.yml file found. Skipping."
+            exit 1
+          fi
 
   lint-yaml:
     name: Lint YAML Files
