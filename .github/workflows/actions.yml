@@ -27,7 +27,7 @@ jobs:
         working-directory: ./git-project  # Adjust this if `docker-compose.yml` is in a subdirectory
         run: |
           echo "Building application"
-          docker compose -f ./git-project/docker-compose.yml up --build -d
+          docker compose -f docker-compose.yml up --build -d
   test:
     name: Test Stage
     runs-on: ubuntu-latest
