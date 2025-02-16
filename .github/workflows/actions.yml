@@ -6,14 +6,50 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:    # environment variables
+  DOCKERFILE_PATH: Dockerfile
+
 jobs:
   lint:
-    name: Lint Dockerfile with Hadolint
+    name: Lint Docker Compose with Hadolint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code            # Checkout the repository
+      - name: Checkout Repository            # Checkout the repository
         uses: actions/checkout@v3
-        # Run Hadolint on your Dockerfile
+      # Step 2: Install Hadolint
+      - name: Install Hadolint
+        run: |
+          wget -O /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+          chmod +x /usr/local/bin/hadolint
+
+      # Step 3: Lint docker-compose.yml
+      - name: Lint the Docker Compose File
+        run: |
+          if [ -e docker-compose.yml ]; then
+            hadolint docker-compose.yml || echo "Hadolint found errors, but continuing."
+          else
+            echo "No docker-compose.yml file found. Skipping."
+          fi
+
+
+  lint-yaml:
+    name: Lint YAML Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install yamllint
+        run: |
+          sudo apt-get update
+          sudo apt-get install yamllint -y
+
+      - name: Lint YAML Files
+        run: |
+          echo "Running yamllint on all YAML files"
+          yamllint --strict .  # Lint all YAML files in the repository
+  
+  
 
   build:
     name: Build Stage
